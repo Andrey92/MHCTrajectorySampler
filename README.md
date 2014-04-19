@@ -18,3 +18,11 @@ Program input consists of:
 Output
 ------
 MHCTrajectorySampler returns a set of likely trajectories of the RFID tag, useful to estimate the `P(L|R)` object, which represents the probability that the tag was in `L` while it was detected by the set `R` of readers.
+
+Build
+-----
+To build project simply run `make` in main project directory (currently will be built only a simple unit test).
+
+Project has been tested on Linux with GNU g++ compiler:
+`Linux 3.12.13-gentoo SMP x86_64`
+`gcc version 4.7.3 (Gentoo 4.7.3-r1 p1.4, pie-0.5.5)`
