@@ -1,6 +1,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <stdexcept>
 
 #include "../include/util/Util.h"
 
@@ -33,5 +34,42 @@ namespace util {
 	bool Util::comparePairs(pair<double, double> a, pair<double, double> b) {
 		return a.second < b.second;
 	}
+
+	template<class T>
+	T** Util::allocateMatrix(unsigned int r, unsigned int c) {
+		if (r <= 0 || c <= 0) throw invalid_argument("Invalid size");
+		// This matrix implementation uses contiguous memory
+		T** m = new T*[r];
+		m[0] = new T[r * c];
+		for (unsigned int i = 1; i < r; i++)
+			m[i] = m[0] + i * c;
+		return m;
+	}
+
+	template<class T>
+	void Util::deallocateMatrix(T** m) {
+		delete[] m[0];
+		delete[] m;
+	}
+
+	template<class T>
+	void Util::fillMatrix(T** m, unsigned int r, unsigned int c, T v) {
+		for (unsigned int i = 0; i < r; i++) {
+			for (unsigned int j = 0; j < c; j++) {
+				m[i][j] = v;
+			}
+		}
+	}
+
+	// Needed by C++ compiler to generate template functions
+	template bool** Util::allocateMatrix<bool>(unsigned int, unsigned int);
+	template unsigned int** Util::allocateMatrix<unsigned int>(unsigned int, unsigned int);
+	template double** Util::allocateMatrix<double>(unsigned int, unsigned int);
+	template void Util::deallocateMatrix<bool>(bool**);
+	template void Util::deallocateMatrix<unsigned int>(unsigned int**);
+	template void Util::deallocateMatrix<double>(double**);
+	template void Util::fillMatrix<bool>(bool**, unsigned int, unsigned int, bool);
+	template void Util::fillMatrix<unsigned int>(unsigned int**, unsigned int, unsigned int, unsigned int);
+	template void Util::fillMatrix<double>(double**, unsigned int, unsigned int, double);
 
 }

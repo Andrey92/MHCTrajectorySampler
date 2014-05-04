@@ -21,7 +21,7 @@ namespace model {
 	class Cell : public Identifiable {
 
 		private:
-			// The size of the cells (in meters),
+			// The size of the cells (in centimeters),
 			// initialized later from conf file
 			static double size;
 

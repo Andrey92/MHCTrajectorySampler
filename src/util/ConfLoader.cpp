@@ -1,5 +1,4 @@
 #include <string>
-#include <sstream>
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -58,7 +57,7 @@ namespace util {
 					Reader::states = states;
 				} else if (v[0] == "cellsize") {
 					Cell::size = stod(v[1]);
-				}
+				} else throw BadConf();
 			}
 			confFile.close();
 		} else {

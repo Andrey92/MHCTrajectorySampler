@@ -17,16 +17,16 @@ namespace model {
 
 	Cell::Cell(const Cell& c) : id(c.id), center(c.center) { }
 
+	double Cell::getSize(void) {
+		return size;
+	}
+
 	unsigned int Cell::getId(void) const {
 		return id;
 	}
 
 	const Point& Cell::getCenter(void) const {
 		return center;
-	}
-
-	double Cell::getSize(void) {
-		return size;
 	}
 
 }

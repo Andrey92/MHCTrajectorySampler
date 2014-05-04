@@ -28,44 +28,62 @@ namespace model {
 	 *
 	 */
 
-	class Location {
+	class Location : public Identifiable {
+
+		// Rename types (hides container implementation)
+		typedef list<Cell> Container;
+		typedef Container::const_iterator const_iterator;
 
 		private:
+			// Location id
+			unsigned int id;
 			// Location name
 			string name;
 			// Position of the top-left corner of the location
 			Point position;
 			// Width and height
 			double width, height;
-			// List of cells included in the location.
+			// Latency constraint of the location
+			unsigned int latency;
+			// Cells included in the location:
 			// A cell belongs to a location if its center is included in it.
-			list<Cell> cells;
+			Container cells;
 
 		public:
 			// Constructors
 			Location();
-			Location(const string&);
-			Location(const string&, double, double, double, double);
-			Location(const string&, const Point& p, double, double);
+			Location(unsigned int);
+			Location(unsigned int, const string&);
+			Location(unsigned int, const string&, double, double, double, double);
+			Location(unsigned int, const string&, const Point&, double, double);
+			Location(unsigned int, const string&, double, double, double, double, unsigned int);
+			Location(unsigned int, const string&, const Point&, double, double, unsigned int);
+			//Location(const Location& 
 
 			// Getter methods
+			virtual unsigned int getId(void) const;
 			virtual const string& getName(void) const;
 			virtual const Point& getPos(void) const;
 			virtual double getWidth(void) const;
 			virtual double getHeight(void) const;
+			virtual unsigned int getLatency(void) const;
+
+			// Set latency constraint
+			virtual void setLatency(unsigned int);
 
 			// Adds a cell to the cells list
-			virtual void add(Cell& c);
+			virtual void add(const Cell&);
 
 			// Number of cells in the location
-			virtual unsigned int nCells(void) const;
+			virtual unsigned int cellCount(void) const;
 
-			// Verifies if p is contained in the location
-			virtual bool contains(Point& p) const;
+			// Verify if a point is contained in the location
+			virtual bool contains(const Point&) const;
+			virtual bool contains(double, double) const;
 
 			// Iterators over cells
-			virtual list<Cell>::iterator begin(void);
-			virtual list<Cell>::iterator end(void);
+			virtual const_iterator begin(void) const;
+			virtual const_iterator end(void) const;
 
 	};
 

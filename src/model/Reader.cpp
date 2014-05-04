@@ -16,6 +16,18 @@ namespace model {
 	ReaderModel Reader::rModel;
 	vector<pair<double, double>> Reader::states;
 
+	Reader::Reader() : id(0), name(), position() { }
+
+	Reader::Reader(unsigned int id) : id(id), name(), position() { }
+
+	Reader::Reader(unsigned int id, const string& name) : id(id), name(name), position() { }
+
+	Reader::Reader(unsigned int id, const string& name, double x, double y) :
+		id(id), name(name), position(x, y) { }
+
+	Reader::Reader(unsigned int id, const string& name, const Point& p) :
+		id(id), name(name), position(p) { }
+
 	ReaderModel Reader::getModel(void) {
 		return rModel;
 	}
@@ -34,6 +46,14 @@ namespace model {
 
 	const Point& Reader::getPos(void) const {
 		return position;
+	}
+
+	double Reader::getMaxRadius(void) const {
+		double radius = 0.0;
+		if (rModel == ReaderModel::nstate) {
+			radius = states[states.size() - 2].second;
+		}
+		return radius;
 	}
 
 	double Reader::getRate(const Point& p) const {

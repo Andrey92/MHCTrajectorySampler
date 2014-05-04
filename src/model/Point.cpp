@@ -12,7 +12,7 @@ namespace model {
 
 	Point::Point(double x, double y) : x(x), y(y) { }
 
-	Point::Point(const Point& p) : x(p.x), y(p.x) { }
+	Point::Point(const Point& p) : x(p.x), y(p.y) { }
 
 	double Point::getX(void) const {
 		return x;

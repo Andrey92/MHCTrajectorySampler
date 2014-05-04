@@ -46,6 +46,7 @@ namespace model {
 
 		public:
 			// Constructors
+			Reader();
 			Reader(unsigned int);
 			Reader(unsigned int, const string&);
 			Reader(unsigned int, const string&, double, double);
@@ -63,6 +64,7 @@ namespace model {
 			virtual unsigned int getId(void) const;
 			virtual const string& getName(void) const;
 			virtual const Point& getPos(void) const;
+			virtual double getMaxRadius(void) const;
 
 			// Returns the detection rate for a given position
 			virtual double getRate(const Point& p) const;

@@ -1,6 +1,4 @@
 #include <string>
-#include <list>
-#include <iterator>
 
 #include "../include/model/Location.h"
 
@@ -12,15 +10,28 @@ namespace model {
 	 * Implementation of Location class.
 	 */
 
-	Location::Location() : name(), position(), width(0), height(0), cells() { }
+	Location::Location() : id(0), name(), position(), width(0), height(0), latency(0), cells() { }
 
-	Location::Location(const string& name) : name(name), position(), width(0), height(0), cells() { }
+	Location::Location(unsigned int id) : id(id), name(), position(), width(0), height(0), latency(0), cells() { }
 
-	Location::Location(const string& name, double x, double y, double w, double h) :
-		name(name), position(x, y), width(w), height(h), cells() { }
+	Location::Location(unsigned int id, const string& name) :
+		id(id), name(name), position(), width(0), height(0), latency(0), cells() { }
 
-	Location::Location(const string& s, const Point& p, double w, double h) :
-		name(name), position(p), width(w), height(h), cells() { }
+	Location::Location(unsigned int id, const string& name, double x, double y, double w, double h) :
+		id(id), name(name), position(x, y), width(w), height(h), latency(0), cells() { }
+
+	Location::Location(unsigned int id, const string& s, const Point& p, double w, double h) :
+		id(id), name(name), position(p), width(w), height(h), latency(0), cells() { }
+
+	Location::Location(unsigned int id, const string& name, double x, double y, double w, double h, unsigned int l) :
+		id(id), name(name), position(x, y), width(w), height(h), latency(l), cells() { }
+
+	Location::Location(unsigned int id, const string& s, const Point& p, double w, double h, unsigned int l) :
+		id(id), name(name), position(p), width(w), height(h), latency(l), cells() { }
+
+	unsigned int Location::getId(void) const {
+		return id;
+	}
 
 	const string& Location::getName(void) const {
 		return name;
@@ -38,27 +49,39 @@ namespace model {
 		return height;
 	}
 
-	void Location::add(Cell& c) {
+	unsigned int Location::getLatency(void) const {
+		return latency;
+	}
+
+	void Location::setLatency(unsigned int l) {
+		latency = l;
+	}
+
+	void Location::add(const Cell& c) {
 		cells.push_back(c);
 	}
 
-	unsigned int Location::nCells(void) const {
+	unsigned int Location::cellCount(void) const {
 		return cells.size();
 	}
 
-	bool Location::contains(Point& p) const {
-		return p.getX() >= position.getX() &&
-			p.getX() <= (position.getX() + width) &&
-			p.getY() >= position.getY() &&
-			p.getY() <= (position.getY() + height);
+	bool Location::contains(const Point& p) const {
+		return contains(p.getX(), p.getY());
 	}
 
-	list<Cell>::iterator Location::begin(void) {
-		return cells.begin();
+	bool Location::contains(double x, double y) const {
+		return x >= position.getX() &&
+			x <= (position.getX() + width) &&
+			y >= position.getY() &&
+			y <= (position.getY() + height);
+	}
+
+	Location::const_iterator Location::begin(void) const {
+		return cells.cbegin();
 	}
 	
-	list<Cell>::iterator Location::end(void) {
-		return cells.end();
+	Location::const_iterator Location::end(void) const {
+		return cells.cend();
 	}
 
 }

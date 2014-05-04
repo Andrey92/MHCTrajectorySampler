@@ -30,8 +30,21 @@ namespace util {
 			// Empty substrings are deleted.
 			static vector<string> split(const string& s, char delim);
 
-			// Compares rate-radius pairs comparing radius values
+			// Compares rate-radius pairs comparing radius values.
 			static bool comparePairs(pair<double, double>, pair<double, double>);
+
+			// Allocates and returns a matrix of parametric type T,
+			// with specified number of rows and columns.
+			template<class T>
+			static T** allocateMatrix(unsigned int, unsigned int);
+
+			// Deallocates a matrix of parametric type T created with allocateMatrix method.
+			template<class T>
+			static void deallocateMatrix(T**);
+
+			// Fills a matrix of parametric type T with a specified value.
+			template<class T>
+			static void fillMatrix(T**, unsigned int, unsigned int, T);
 
 	};
 
