@@ -1,12 +1,11 @@
 #include <string>
 #include <fstream>
-#include <list>
-#include <unordered_map>
 
 #include "../include/model/Location.h"
 #include "../include/model/Reader.h"
 #include "../include/model/Map.h"
 #include "../include/util/MapLoader.h"
+#include "../include/util/Types.h"
 #include "../include/util/Util.h"
 #include "../include/exceptions/BadInput.h"
 
@@ -22,11 +21,6 @@ namespace util {
 
 	const char MapLoader::SEP = ',';
 	const char MapLoader::CSEP = ' ';
-
-	typedef list<Location> LocationSet;
-	typedef list<Reader> ReaderSet;
-	typedef pair<string, unsigned int> NameIdPair;
-	typedef unordered_map<string,unsigned int> NameIdMap;
 
 	Map* MapLoader::loadMap(const string& mapFileName, const string& constrFileName) {
 		ifstream mapFile(mapFileName);
@@ -53,7 +47,7 @@ namespace util {
 					readers.push_back(Reader(rId++, name, x, y));
 				} else throw BadInput();
 			}
-		}
+		} else throw BadInput();
 		Map* map = Map::createMap<LocationSet,ReaderSet>(locations, readers);
 		ifstream constrFile(constrFileName);
 		if (constrFile.is_open()) {

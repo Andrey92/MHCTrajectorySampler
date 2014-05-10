@@ -56,6 +56,20 @@ namespace model {
 		return radius;
 	}
 
+	double Reader::getRate(const Cell& c) const {
+		double rate = getRate(c.getCenter());
+		if (rate == 0.0) {
+			// Find nearest point and returns corresponding rate
+			double x = position.getX(), y = position.getY(),
+				cx = c.getCenter().getX(), cy = c.getCenter().getY(),
+				fx = cx + Cell::getSize(), fy = cy + Cell::getSize();
+			double px = (x < cx ? cx : (x < fx ? x : fx)),
+				py = (y < cy ? cy : (y < fy ? y : fy));
+			return getRate(Point(px, py));
+		}
+		return rate;
+	}
+
 	double Reader::getRate(const Point& p) const {
 		double rate = 0.0;
 		if (rModel == ReaderModel::nstate) {
@@ -69,6 +83,10 @@ namespace model {
 			}
 		}
 		return rate;
+	}
+
+	bool Reader::operator== (const Reader& r) const {
+		return id == r.id;
 	}
 
 	vector<pair<double, double>>::iterator Reader::begin(void) {

@@ -9,6 +9,7 @@
 #include "include/model/Map.h"
 #include "include/util/ConfLoader.h"
 #include "include/util/MapLoader.h"
+#include "include/util/ReadingsLoader.h"
 #include "include/exceptions/BadConf.h"
 #include "include/exceptions/BadInput.h"
 
@@ -53,6 +54,22 @@ int main() {
 	}
 	cout << "Done!" << endl << endl;
 	test(*m);
+	string readingsFile("input/readings.txt");
+	Readings* r;
+	try {
+		r = ReadingsLoader::loadReadings(readingsFile, *m);
+	} catch(BadInput& e) {
+		cout << e.what() << endl;
+	} catch(exception& e) {
+		cout << "Error while loading input files" << endl;
+	}
+	for (auto it = r->cbegin(); it != r->cend(); it++) {
+		cout << "{ ";
+		for (auto r_it = it->first.cbegin(); r_it != it->first.cend(); r_it++) {
+			cout << m->getReader(*r_it).getName() << " ";
+		}
+		cout << "} : " << it->second << endl;
+	}
 	return 0;
 }
 

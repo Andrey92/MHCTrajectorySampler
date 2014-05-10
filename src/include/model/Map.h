@@ -48,6 +48,9 @@ namespace model {
 			// Returns the minimum distance between a location and a reader,
 			// or 0 if reader is within the location.
 			virtual double minDistance(const Location&, const Reader&) const;
+			// Returns true if exists at least one cell in the given Location
+			// "detectable" by all readers in the ReaderSet
+			template<class RSet> bool existsCommonCell(const RSet&, const Location&) const;
 
 			// Private constructor
 			Map() : width(0), height(0) { };
@@ -65,7 +68,9 @@ namespace model {
 			// Destructor
 			~Map();
 
-			// Getter methods (constraints)
+			// Getter methods
+			virtual const Location& getLocation(unsigned int) const;
+			virtual const Reader& getReader(unsigned int) const;
 			virtual unsigned int getLocationCount(void) const;
 			virtual unsigned int getReaderCount(void) const;
 			virtual unsigned int getCellCount(void) const;

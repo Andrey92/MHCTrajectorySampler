@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "Point.h"
+#include "Cell.h"
 #include "../util/ConfLoader.h"
 #include "../util/Identifiable.h"
 
@@ -44,6 +45,9 @@ namespace model {
 			// Position of the reader
 			Point position;
 
+			// Returns the detection rate for a given position
+			virtual double getRate(const Point& p) const;
+
 		public:
 			// Constructors
 			Reader();
@@ -66,8 +70,11 @@ namespace model {
 			virtual const Point& getPos(void) const;
 			virtual double getMaxRadius(void) const;
 
-			// Returns the detection rate for a given position
-			virtual double getRate(const Point& p) const;
+			// Returns the detection rate for a given Cell
+			virtual double getRate(const Cell& c) const;
+
+			// Equality operator
+			virtual bool operator== (const Reader& r) const;
 
 			// Iterators over states of the n-state model
 			static vector<pair<double, double>>::iterator begin(void);

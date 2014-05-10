@@ -53,7 +53,7 @@ namespace model {
 				Cell c = *it;
 				for (unsigned int j = 0; j < rCount; j++) {
 					Reader r = readers[j];
-					p[r.getId()][c.getId()] = r.getRate(c.getCenter());
+					p[r.getId()][c.getId()] = r.getRate(c);
 				}
 			}
 		}
@@ -65,6 +65,16 @@ namespace model {
 		Util::deallocateMatrix<bool>(dr);
 		Util::deallocateMatrix<unsigned int>(tt);
 		Util::deallocateMatrix<double>(p);
+	}
+
+	const Location& Map::getLocation(unsigned int id) const {
+		if (!isValid(id)) throw invalid_argument("Invalid id");
+		return locations[id];
+	}
+
+	const Reader& Map::getReader(unsigned int id) const {
+		if (id < 0 || id >= rCount) throw invalid_argument("Invalid id");
+		return readers[id];
 	}
 
 	unsigned int Map::getLocationCount(void) const {

@@ -22,11 +22,13 @@ namespace util {
 	}
 
 	vector<string> Util::split(const string& s, char delim) {
-		stringstream ss(s);
-		string tmp;
 		vector<string> v;
-		while (getline(ss, tmp, delim)) {
-			if (trim(tmp) != "") v.push_back(tmp);
+		if (s.size() > 0) {
+			stringstream ss(s);
+			string tmp;
+			while (getline(ss, tmp, delim)) {
+				if (trim(tmp) != "") v.push_back(tmp);
+			}
 		}
 		return v;
 	}
