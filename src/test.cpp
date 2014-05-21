@@ -3,10 +3,12 @@
 #include <string>
 #include <utility>
 #include <list>
+#include <stdexcept>
 
 #include "include/model/Cell.h"
 #include "include/model/Reader.h"
 #include "include/model/Map.h"
+#include "include/sampler/MHCSampler.h"
 #include "include/util/ConfLoader.h"
 #include "include/util/MapLoader.h"
 #include "include/util/ReadingsLoader.h"
@@ -15,6 +17,7 @@
 
 using namespace std;
 using namespace model;
+using namespace sampler;
 using namespace util;
 using namespace exceptions;
 
@@ -70,6 +73,18 @@ int main() {
 		}
 		cout << "} : " << it->second << endl;
 	}
+	MHCSampler mhcs(m, r);
+	Trajectory* t = mhcs.generateFirstSample();
+	if (t != nullptr) {
+		cout << "First trajectory generated:" << endl;
+		unsigned long l = 0;
+		auto lit = t->lbegin();
+		for (auto lhit = t->lhbegin(); lit != t->lend(); lit++, lhit++, l++) {
+			cout << l * 500 << ": <" << *lit << ", " << *lhit << ">" << endl;
+		}
+	}
+	mhcs.generateSamples(20000,50);
+	//mhcs.printProbabilities(50);
 	return 0;
 }
 
@@ -114,41 +129,41 @@ void test(const Map& m) {
 	for (auto it = m.rbegin(); it != m.rend(); it++) {
 		Reader r = *it;
 		cout << "Reader " << r.getName() << ": ";
-		Map::LocationSet* ls = m.likelyLocations(r);
+		LocationSet* ls = m.likelyLocations(r.getId());
 		for (auto l_it = ls->cbegin(); l_it != ls->cend(); l_it++) {
-			Location l = *l_it;
-			cout << l.getName() << " ";
+			unsigned int l = *l_it;
+			cout << m.getLocation(l).getName() << " ";
 		}
 		cout << endl;
 	}
 	Reader r1 = *(m.rbegin() + 5);
 	Reader r2 = *(m.rbegin());
 	Reader r3 = *(m.rend() - 2);
-	list<Reader> lr;
-	lr.push_back(r1);
-	lr.push_back(r2);
-	lr.push_back(r3);
+	list<unsigned int> lr;
+	lr.push_back(r1.getId());
+	lr.push_back(r2.getId());
+	lr.push_back(r3.getId());
 	cout << endl << "Set of reader ( ";
 	for (auto it = lr.cbegin(); it != lr.cend(); it++) {
-		cout << (*it).getName() << " ";
+		cout << m.getReader(*it).getName() << " ";
 	}
 	cout << ") : ";
-	Map::LocationSet* ls = m.likelyLocations(lr);
+	LocationSet* ls = m.likelyLocations(lr);
 	for (auto l_it = ls->cbegin(); l_it != ls->cend(); l_it++) {
-		Location l = *l_it;
-		cout << l.getName() << " ";
+		unsigned int l = *l_it;
+		cout << m.getLocation(l).getName() << " ";
 	}
 	cout << endl << endl << "----- Likelihood test -----" << endl;
 	Location l = *(ls->cbegin());
-	double p = m.prob(lr, l);
+	double p = m.prob(lr, l.getId());
 	cout << "Probability that an object is detected by ( ";
 	for (auto it = lr.cbegin(); it != lr.cend(); it++) {
-		cout << (*it).getName() << " ";
+		cout << m.getReader(*it).getName() << " ";
 	}
 	cout << ") given that it is into " << l.getName() << ": " << p << endl;
-	list<Reader> lr2;
-	lr2.push_back(r2);
-	p = m.prob(lr2, l);
-	cout << "Probability that an object is detected by ( " << (*(lr2.cbegin())).getName() <<
+	list<unsigned int> lr2;
+	lr2.push_back(r2.getId());
+	p = m.prob(lr2, l.getId());
+	cout << "Probability that an object is detected by ( " << r2.getName() <<
 		" ) given that it is into " << l.getName() << ": " << p << endl;
 }

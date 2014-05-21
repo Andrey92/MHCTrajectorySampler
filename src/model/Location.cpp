@@ -10,24 +10,26 @@ namespace model {
 	 * Implementation of Location class.
 	 */
 
-	Location::Location() : id(0), name(), position(), width(0), height(0), latency(0), cells() { }
+	Location::Location() :
+		id(0), name(), position(), width(0), height(0), latency(0), maxTimeFrom(0), maxTimeTo(0), cells() { }
 
-	Location::Location(unsigned int id) : id(id), name(), position(), width(0), height(0), latency(0), cells() { }
+	Location::Location(unsigned int id) :
+		id(id), name(), position(), width(0), height(0), latency(0), maxTimeFrom(0), maxTimeTo(0), cells() { }
 
 	Location::Location(unsigned int id, const string& name) :
-		id(id), name(name), position(), width(0), height(0), latency(0), cells() { }
+		id(id), name(name), position(), width(0), height(0), latency(0), maxTimeFrom(0), maxTimeTo(0), cells() { }
 
 	Location::Location(unsigned int id, const string& name, double x, double y, double w, double h) :
-		id(id), name(name), position(x, y), width(w), height(h), latency(0), cells() { }
+		id(id), name(name), position(x, y), width(w), height(h), latency(0), maxTimeFrom(0), maxTimeTo(0), cells() { }
 
 	Location::Location(unsigned int id, const string& s, const Point& p, double w, double h) :
-		id(id), name(name), position(p), width(w), height(h), latency(0), cells() { }
+		id(id), name(name), position(p), width(w), height(h), latency(0), maxTimeFrom(0), maxTimeTo(0), cells() { }
 
 	Location::Location(unsigned int id, const string& name, double x, double y, double w, double h, unsigned int l) :
-		id(id), name(name), position(x, y), width(w), height(h), latency(l), cells() { }
+		id(id), name(name), position(x, y), width(w), height(h), latency(l), maxTimeFrom(0), maxTimeTo(0), cells() { }
 
 	Location::Location(unsigned int id, const string& s, const Point& p, double w, double h, unsigned int l) :
-		id(id), name(name), position(p), width(w), height(h), latency(l), cells() { }
+		id(id), name(name), position(p), width(w), height(h), latency(l), maxTimeFrom(0), maxTimeTo(0), cells() { }
 
 	unsigned int Location::getId(void) const {
 		return id;
@@ -53,8 +55,24 @@ namespace model {
 		return latency;
 	}
 
+	unsigned int Location::getMaxTimeFrom(void) const {
+		return maxTimeFrom;
+	}
+
+	unsigned int Location::getMaxTimeTo(void) const {
+		return maxTimeTo;
+	}
+
 	void Location::setLatency(unsigned int l) {
 		latency = l;
+	}
+
+	void Location::setMaxTimeFrom(unsigned int t) {
+		maxTimeFrom = t;
+	}
+
+	void Location::setMaxTimeTo(unsigned int t) {
+		maxTimeTo = t;
 	}
 
 	void Location::add(const Cell& c) {

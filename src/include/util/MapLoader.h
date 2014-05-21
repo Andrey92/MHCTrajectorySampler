@@ -2,6 +2,7 @@
 #define MAP_LOADER_H
 
 #include <string>
+#include <list>
 
 #include "../model/Map.h"
 
@@ -17,6 +18,9 @@ namespace util {
 	 */
 
 	class MapLoader {
+
+		typedef list<Location> LoadableLocationSet;
+		typedef list<Reader> LoadableReaderSet;
 
 		private:
 			// Private constructor (static class)

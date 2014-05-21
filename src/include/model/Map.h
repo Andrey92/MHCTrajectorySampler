@@ -3,6 +3,7 @@
 
 #include "Location.h"
 #include "Reader.h"
+#include "../util/Types.h"
 
 using namespace util;
 
@@ -48,9 +49,9 @@ namespace model {
 			// Returns the minimum distance between a location and a reader,
 			// or 0 if reader is within the location.
 			virtual double minDistance(const Location&, const Reader&) const;
-			// Returns true if exists at least one cell in the given Location
+			// Returns true if exists at least one cell in the given location (specified by id)
 			// "detectable" by all readers in the ReaderSet
-			template<class RSet> bool existsCommonCell(const RSet&, const Location&) const;
+			template<class RSet> bool existsCommonCell(const RSet&, unsigned int) const;
 
 			// Private constructor
 			Map() : width(0), height(0) { };
@@ -59,7 +60,6 @@ namespace model {
 
 			typedef const Location* location_iterator;
 			typedef const Reader* reader_iterator;
-			typedef list<Location> LocationSet;
 
 			// Factory method to create a map object
 			// Receives a set of Locations and a set of Readers
@@ -87,17 +87,19 @@ namespace model {
 			virtual void setLT(unsigned int, unsigned int);
 			virtual void setTT(unsigned int, unsigned int, unsigned int);
 
-			// Returns the set of likely locations related to a set of reader
+			// Returns the set of likely locations related to a set of readers
+			// (Readers are specified as a set of id)
 			template<class RSet>
 			LocationSet* likelyLocations(const RSet&) const;
 
-			// Same as above, for a single reader
-			virtual LocationSet* likelyLocations(const Reader&) const;
+			// Same as above, for a single reader (specified by id)
+			virtual LocationSet* likelyLocations(unsigned int) const;
 
-			// Get the probability P(R|L) that an object is detected by a set 'R' of readers
-			// given that it is into location 'L' (likelihood function).
+			// Get the probability P(R|L) (likelihood) that an object is detected
+			// by a set 'R' of readers, given that it is into location 'L'.
+			// Readers and Location are all specified by id.
 			template<class RSet>
-			double prob(const RSet&, const Location&) const;
+			double prob(const RSet&, unsigned int) const;
 
 			// Iterator over locations
 			virtual location_iterator lbegin(void) const;
@@ -106,6 +108,7 @@ namespace model {
 			// Iterator over readers
 			virtual reader_iterator rbegin(void) const;
 			virtual reader_iterator rend(void) const;
+
 	};
 
 }

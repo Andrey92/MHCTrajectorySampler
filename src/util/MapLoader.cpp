@@ -5,7 +5,6 @@
 #include "../include/model/Reader.h"
 #include "../include/model/Map.h"
 #include "../include/util/MapLoader.h"
-#include "../include/util/Types.h"
 #include "../include/util/Util.h"
 #include "../include/exceptions/BadInput.h"
 
@@ -24,8 +23,8 @@ namespace util {
 
 	Map* MapLoader::loadMap(const string& mapFileName, const string& constrFileName) {
 		ifstream mapFile(mapFileName);
-		LocationSet locations;
-		ReaderSet readers;
+		LoadableLocationSet locations;
+		LoadableReaderSet readers;
 		NameIdMap locationsMap;
 		string line;
 		if (mapFile.is_open()) {
@@ -48,7 +47,7 @@ namespace util {
 				} else throw BadInput();
 			}
 		} else throw BadInput();
-		Map* map = Map::createMap<LocationSet,ReaderSet>(locations, readers);
+		Map* map = Map::createMap<LoadableLocationSet,LoadableReaderSet>(locations, readers);
 		ifstream constrFile(constrFileName);
 		if (constrFile.is_open()) {
 			while (getline(constrFile, line)) {

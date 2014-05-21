@@ -11,7 +11,7 @@ using namespace exceptions;
 namespace util {
 
 	/*
-	 * Implementation of DataLoader utility class.
+	 * Implementation of ReadingsLoader utility class.
 	 */
 
 	const char ReadingsLoader::SEP = ',';

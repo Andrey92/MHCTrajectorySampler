@@ -12,7 +12,7 @@ using namespace model;
 namespace util {
 
 	/*
-	 * DataLoader class loads readings data from file.
+	 * ReadingsLoader class loads readings data from file.
 	 *
 	 * Each line of the file is in the form:
 	 * 	{ri},t

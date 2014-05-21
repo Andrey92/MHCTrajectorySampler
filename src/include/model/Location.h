@@ -45,6 +45,8 @@ namespace model {
 			double width, height;
 			// Latency constraint of the location
 			unsigned int latency;
+			// Maximum Traveling Time Constraints (from and to other locations)
+			unsigned int maxTimeFrom, maxTimeTo;
 			// Cells included in the location:
 			// A cell belongs to a location if its center is included in it.
 			Container cells;
@@ -58,7 +60,6 @@ namespace model {
 			Location(unsigned int, const string&, const Point&, double, double);
 			Location(unsigned int, const string&, double, double, double, double, unsigned int);
 			Location(unsigned int, const string&, const Point&, double, double, unsigned int);
-			//Location(const Location& 
 
 			// Getter methods
 			virtual unsigned int getId(void) const;
@@ -67,9 +68,15 @@ namespace model {
 			virtual double getWidth(void) const;
 			virtual double getHeight(void) const;
 			virtual unsigned int getLatency(void) const;
+			virtual unsigned int getMaxTimeFrom(void) const;
+			virtual unsigned int getMaxTimeTo(void) const;
 
 			// Set latency constraint
 			virtual void setLatency(unsigned int);
+
+			// Set maximum Traveling Time constraints
+			virtual void setMaxTimeFrom(unsigned int);
+			virtual void setMaxTimeTo(unsigned int);
 
 			// Adds a cell to the cells list
 			virtual void add(const Cell&);
