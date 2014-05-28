@@ -73,9 +73,6 @@ namespace model {
 			// Returns the detection rate for a given Cell
 			virtual double getRate(const Cell& c) const;
 
-			// Equality operator
-			virtual bool operator== (const Reader& r) const;
-
 			// Iterators over states of the n-state model
 			static vector<pair<double, double>>::iterator begin(void);
 			static vector<pair<double, double>>::iterator end(void);

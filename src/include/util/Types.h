@@ -20,7 +20,7 @@ namespace util {
 	typedef pair<string, unsigned int> NameIdPair;
 	typedef unordered_map<string, unsigned int> NameIdMap;
 
-	typedef pair<IdSet, unsigned long> Reading;
+	typedef pair<ReaderSet, unsigned long> Reading;
 	typedef vector<Reading> Readings;
 
 }

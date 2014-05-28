@@ -85,10 +85,6 @@ namespace model {
 		return rate;
 	}
 
-	bool Reader::operator== (const Reader& r) const {
-		return id == r.id;
-	}
-
 	vector<pair<double, double>>::iterator Reader::begin(void) {
 		return states.begin();
 	}

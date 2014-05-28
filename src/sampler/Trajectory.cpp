@@ -4,14 +4,14 @@
 
 namespace sampler {
 
-	Trajectory::Trajectory(unsigned long size) : lo(size), lh(size), likelihood(1.0) {
+	Trajectory::Trajectory(unsigned int id, unsigned long size) : id(id), lo(size), lh(size), likelihood(1.0) {
 		for (unsigned long i = 0; i < size; i++) {
 			lo[i] = -1;
 			lh[i] = 1.0;
 		}
 	}
 
-	Trajectory::Trajectory(const Trajectory& t) : lo(t.lo), lh(t.lh), likelihood(t.likelihood) { }
+	Trajectory::Trajectory(unsigned int id, const Trajectory& t) : id(id), lo(t.lo), lh(t.lh), likelihood(t.likelihood) { }
 
 	Trajectory::~Trajectory() { }
 
@@ -21,6 +21,10 @@ namespace sampler {
 
 	bool Trajectory::isValidLH(double lh) const {
 		return lh >= 0.0 && lh <= 1.0;
+	}
+
+	unsigned int Trajectory::getId(void) const {
+		return id;
 	}
 
 	unsigned long Trajectory::getSize(void) const {
@@ -56,6 +60,10 @@ namespace sampler {
 		likelihood.div(lh[t]);
 		lh[t] = 1.0;
 		likelihood.mul(lh[t]);
+	}
+
+	bool Trajectory::operator== (const Trajectory& t) const {
+		return id == t.id;
 	}
 
 	Trajectory::loc_iterator Trajectory::lbegin(void) const {

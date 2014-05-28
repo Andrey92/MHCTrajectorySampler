@@ -33,7 +33,8 @@ int main() {
 	} catch(exception& e) {
 		cout << "Error while loading conf file" << endl;
 	}
-	cout << "Done!" << endl << endl;
+	cout << "Done!" << endl;
+/*	cout << endl;
 	if (Reader::getModel() == ReaderModel::nstate) {
 		cout << "Reader model loaded: n-state" << endl;
 	}
@@ -43,10 +44,10 @@ int main() {
 		cout << rr.first << ":" << rr.second << '\t';
 	}
 	cout << endl;
-	cout << "Cell size: " << Cell::getSize() << "cm" << endl;
+	cout << "Cell size: " << Cell::getSize() << "cm" << endl << endl;*/
 	string mapFile("input/map.txt");
 	string constrFile("input/IC_DU_LT_TT.txt");
-	cout << endl << "Loading map... " << flush;
+	cout << "Loading map... " << flush;
 	Map* m;
 	try {
 		m = MapLoader::loadMap(mapFile, constrFile);
@@ -56,8 +57,8 @@ int main() {
 		cout << "Error while loading input files" << endl;
 	}
 	cout << "Done!" << endl << endl;
-	test(*m);
-	string readingsFile("input/readings.txt");
+	//test(*m);
+	string readingsFile("input/readings10min.txt");
 	Readings* r;
 	try {
 		r = ReadingsLoader::loadReadings(readingsFile, *m);
@@ -66,25 +67,40 @@ int main() {
 	} catch(exception& e) {
 		cout << "Error while loading input files" << endl;
 	}
-	for (auto it = r->cbegin(); it != r->cend(); it++) {
+/*	list<unsigned int> l1;
+	list<unsigned int> l2;
+	list<unsigned int> l3;
+	list<unsigned int> l4;
+	
+	l2.push_back(2);
+	
+	l3.push_back(1);
+
+	l4.push_back(2);
+	l4.push_back(1);
+	
+	double p1 = m->prob(l1, 9);
+	double p2 = m->prob(l2, 9);
+	double p3 = m->prob(l3, 9);
+	double p4 = m->prob(l4, 9);
+	cout << p1 << " + " << p2 << " + " << p3 << " + " << p4 << " = " << p1 + p2 + p3 + p4 << endl;*/
+/*	for (auto it = r->cbegin(); it != r->cend(); it++) {
 		cout << "{ ";
 		for (auto r_it = it->first.cbegin(); r_it != it->first.cend(); r_it++) {
 			cout << m->getReader(*r_it).getName() << " ";
 		}
 		cout << "} : " << it->second << endl;
-	}
+	}*/
 	MHCSampler mhcs(m, r);
-	Trajectory* t = mhcs.generateFirstSample();
-	if (t != nullptr) {
-		cout << "First trajectory generated:" << endl;
-		unsigned long l = 0;
-		auto lit = t->lbegin();
-		for (auto lhit = t->lhbegin(); lit != t->lend(); lit++, lhit++, l++) {
-			cout << l * 500 << ": <" << *lit << ", " << *lhit << ">" << endl;
+	mhcs.generateSamplesUntilWorth(10000, 0);
+	for (unsigned long time = 0; time < mhcs.getSampleSize(); time++) {
+		const ProbMap* pm = mhcs.getProbabilities(time);
+		cout << "Probabilities at instant " << time*500 << ":" << endl;
+		for (auto it = pm->cbegin(); it != pm->cend(); it++) {
+			cout << "    P(" << m->getLocation(it->first).getName() << ") = " << it->second << endl;
 		}
+		cout << endl;
 	}
-	mhcs.generateSamples(20000,50);
-	//mhcs.printProbabilities(50);
 	return 0;
 }
 

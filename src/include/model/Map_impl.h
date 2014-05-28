@@ -51,63 +51,13 @@ namespace model {
 
 	template<class RSet>
 	LocationSet* Map::likelyLocations(const RSet& rs) const {
-		auto it = rs.cbegin();
-		LocationSet* ls;
-		if (it == rs.cend()) {
-			// No one reader: all locations are likely
-			ls = new LocationSet();
-			for (unsigned int i = 0; i < lCount; i++) {
+		LocationSet* ls = new LocationSet();
+		for (unsigned int i = 0; i < lCount; i++) {
+			if (prob(rs, locations[i].getId()) > 0.0) {
 				ls->push_back(locations[i].getId());
-			}
-			return ls;
-		}
-		ls = likelyLocations(*it);
-		it++;
-		for ( ; it != rs.cend(); it++) {
-			LocationSet* tmp = likelyLocations(*it);
-			for (auto l_it = ls->begin(); l_it != ls->end(); ) {
-				unsigned int l = *l_it;
-				bool found = false;
-				for (auto l_it2 = tmp->cbegin(); l_it2 != tmp->cend(); l_it2++) {
-					unsigned int l2 = *l_it2;
-					if (l == l2) {
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					l_it = ls->erase(l_it);
-				} else {
-					l_it++;
-				}
-			}
-			delete tmp;
-		}
-		for (auto l_it = ls->begin(); l_it != ls->end(); ) {
-			if (!existsCommonCell(rs, *l_it)) {
-				l_it = ls->erase(l_it);
-			} else {
-				l_it++;
 			}
 		}
 		return ls;
-	}
-
-	template<class RSet>
-	bool Map::existsCommonCell(const RSet& rs, unsigned int id) const {
-		Location l = getLocation(id);
-		for (auto it = l.begin(); it != l.end(); it++) {
-			bool found = true;
-			for (auto r_it = rs.cbegin(); r_it != rs.cend(); r_it++) {
-				Reader r = readers[*r_it];
-				if (p[r.getId()][it->getId()] == 0.0) {
-					found = false;
-					break;
-				}
-			}
-			if (found) return true;
-		}
-		return false;
 	}
 
 	template<class RSet>
