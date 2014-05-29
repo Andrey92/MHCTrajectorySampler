@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <iomanip>
 
 #include "../include/sampler/MHCSampler.h"
 
@@ -19,6 +20,8 @@ namespace sampler {
 		for (unsigned long l = 0; l < r->size(); l++) {
 			ls[l] = map->likelyLocations(r->at(l).first);
 		}
+		firstSample = generateFirstSample();
+		cout << "Backtracking trajectory: " << firstSample->getTrajectoryLikelihood().getValue() << endl << endl;;
 	}
 
 	unsigned long MHCSampler::getSampleSize(void) const {
@@ -229,17 +232,17 @@ namespace sampler {
 	}
 
 	void MHCSampler::generateSamples(unsigned long n, unsigned long b) {
-		Trajectory* t = generateFirstSample();
-		cout << "Backtracking traj: " << t->getTrajectoryLikelihood().getValue() << endl << endl;
-		generateSamples(t, n, b);
+		generateSamples(firstSample, n, b);
 	}
 
 	void MHCSampler::generateSamplesUntilWorth(unsigned long n, unsigned long b) {
-		Trajectory* t = generateFirstSample();
-		cout << "Backtracking traj: " << t->getTrajectoryLikelihood().getValue() << endl;
+		Trajectory* t = firstSample;
+		unsigned long i = 0;
 		do {
-			cout << endl << "Try to generate " << n << " trajectories:" << endl << endl;
+			cout << endl << "[Iteration " << i << "] Try to generate " << n << " trajectories:" << endl << endl;
 			t = generateSamples(t, n, b);
+			i++;
+			b = 0; // Burn-in phase only on first iteration
 		} while (t != nullptr);
 		cout << endl << "No likelihood improvements in last " << n << " trajectories: MHC stopped." << endl;
 	}
@@ -247,6 +250,7 @@ namespace sampler {
 	Trajectory* MHCSampler::generateSamples(Trajectory* t, unsigned int n, unsigned int b) {
 		srand(time(NULL));
 		bool improvement = false;
+		bool burnIn = true;
 		for (unsigned long i = 0; i < n + b; i++) {
 			Trajectory* tNew = new Trajectory(i + 1, *t);
 			for (unsigned long j = 0; j < readings->size(); j++) {
@@ -264,13 +268,17 @@ namespace sampler {
 			long double jitter = (long double) rand() / RAND_MAX;
 			HPFloat w = tNew->getTrajectoryLikelihood() / t->getTrajectoryLikelihood();
 			if (jitter < w.getValue()) {
-				cout << "[MHC at iteration " << i << "] Lnew: " << tNew->getTrajectoryLikelihood().getValue() <<
-					"\t| Lnew/L: " << w.getValue() << "\t| Jitter: " << jitter << endl;
+				cout << "[MHC at iteration " << setw(8) << i << "] | Lnew: " << setw(18) << tNew->getTrajectoryLikelihood().getValue() <<
+					" | Lnew/L: " << setw(18) << w.getValue() << " | Jitter: " << jitter << endl;
 				delete t;
 				t = tNew;
 				improvement = true;
 			} else {
 				delete tNew;
+			}
+			if (burnIn && i >= b) {
+				if (b > 0) cout << "[End of the burn-in phase]" << endl;
+				burnIn = false;
 			}
 			if (i >= b) {
 				Samples::iterator it;

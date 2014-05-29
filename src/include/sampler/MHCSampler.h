@@ -20,6 +20,8 @@ namespace sampler {
 			const Readings* readings;
 			// Set of likely locations for each time instant
 			LocationSet** ls;
+			// First sample generated with backtracking
+			Trajectory* firstSample;
 			// Collection of samples generated
 			Samples samples;
 			// Probabilities cache
@@ -58,7 +60,7 @@ namespace sampler {
 			virtual double computeProb(unsigned long, unsigned int) const;
 
 		public:
-			// Constructors
+			// Constructor
 			MHCSampler(const Map*, const Readings*);
 
 			// Returns sample (trajectory) size

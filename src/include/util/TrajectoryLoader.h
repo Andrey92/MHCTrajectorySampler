@@ -1,13 +1,13 @@
-#ifndef READINGS_LOADER_H
-#define READINGS_LOADER_H
+#ifndef TRAJECTORY_LOADER_H
+#define TRAJECTORY_LOADER_H
 
 #include <string>
 
-#include "Types.h"
+#include "../sampler/Trajectory.h"
 #include "../model/Map.h"
 
 using namespace std;
-using namespace model;
+using namespace sampler;
 
 namespace util {
 
@@ -22,24 +22,22 @@ namespace util {
 	 * These data are used to generate sample trajectories.
 	 */
 
-	class ReadingsLoader {
-		
+	class TrajectoryLoader {
+
 		private:
 			// Private constructor (static class)
-			ReadingsLoader() { };
+			TrajectoryLoader() { };
 
 		public:
 
-			// Characters used in readings file:
-			// To separate values (readers and time instants)
+			// Characters used in map file:
+			// To separate values (time instants and locations)
 			static const char SEP;
-			// To delimit reader set
-			static const char STARTSET;
-			static const char ENDSET;
 
 			// Load readings from specified file name
 			// It uses a Map object to identify Readers
-			static Readings* loadReadings(const string&, const Map&);
+			static Trajectory* loadTrajectory(const string&, const Map&);
+
 	};
 
 }
