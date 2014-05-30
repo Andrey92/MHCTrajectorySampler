@@ -1,6 +1,10 @@
 #ifndef HPFLOAT_H
 #define HPFLOAT_H
 
+#include <string>
+
+using namespace std;
+
 namespace util {
 
 	/*
@@ -33,6 +37,9 @@ namespace util {
 			// Returns a value representation of the number as a long double.
 			// Loss of significant digits may occur.
 			virtual long double getValue(void) const;
+
+			// Returns a string representation of the number
+			virtual const string toString(void) const;
 
 			// Multiply number for a given long double
 			virtual void mul(long double);

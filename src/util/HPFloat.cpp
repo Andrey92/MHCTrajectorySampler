@@ -1,3 +1,6 @@
+#include <sstream>
+#include <iomanip>
+
 #include "../include/util/HPFloat.h"
 
 namespace util {
@@ -38,6 +41,13 @@ namespace util {
 			exp++;
 		}
 		return value;
+	}
+
+	const string HPFloat::toString(void) const {
+		ostringstream ss;
+		ss << fixed << setprecision(5) << m;
+		if (e != 0) ss << "e" << (e > 0 ? "+" : "") << e;
+		return ss.str();
 	}
 
 	void HPFloat::mul(long double n) {

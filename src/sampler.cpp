@@ -60,7 +60,6 @@ int main(int argc, char** argv) {
 	const vector<double> v = getMHCAccuracy(mhcs, *m);
 	cout << endl << "Accuracy of MHCSampler with " << N - B << " samples: " << v[0] << endl <<
 		"Location miss rate: " << v[1] << endl;
-
 	return 0;
 }
 
@@ -71,8 +70,10 @@ void loadConf(void) {
 		ConfLoader::loadConf(confFile);
 	} catch(BadConf& e) {
 		cout << e.what() << endl;
+		exit(-1);
 	} catch(exception& e) {
 		cout << "Error while loading conf file" << endl;
+		exit(-1);
 	}
 	cout << "Done!" << endl;
 }
@@ -86,8 +87,10 @@ Map* loadMap(void) {
 		m = MapLoader::loadMap(mapFile, constrFile);
 	} catch(BadInput& e) {
 		cout << e.what() << endl;
+		exit(-1);
 	} catch(exception& e) {
 		cout << "Error while loading input files" << endl;
+		exit(-1);
 	}
 	cout << "Done!" << endl << endl;
 	return m;

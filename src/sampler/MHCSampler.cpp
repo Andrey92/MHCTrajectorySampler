@@ -21,7 +21,7 @@ namespace sampler {
 			ls[l] = map->likelyLocations(r->at(l).first);
 		}
 		firstSample = generateFirstSample();
-		cout << "Backtracking trajectory: " << firstSample->getTrajectoryLikelihood().getValue() << endl << endl;;
+		cout << "Backtracking trajectory: " << firstSample->getTrajectoryLikelihood().toString() << endl << endl;;
 	}
 
 	unsigned long MHCSampler::getSampleSize(void) const {
@@ -256,20 +256,23 @@ namespace sampler {
 			for (unsigned long j = 0; j < readings->size(); j++) {
 				// Choose a random location for instant 'j' (among likely locations)
 				LocationSet* l = ls[j];
+				long count = 0;
 				do {
 					unsigned int pos = (unsigned int) rand() % l->size();
 					auto it = l->cbegin();
 					for ( ; pos > 0; it++, pos--) ;
 					unsigned int id = *it;
 					tNew->setLocation(id, j, p.getProb(readings->at(j).first, id));
+					if (count > 1000) cout << j << " " << flush;
+					count++;
 				} while (!checkConstraints(tNew, j));
 			}
 			// Metropolis Hastings
 			long double jitter = (long double) rand() / RAND_MAX;
 			HPFloat w = tNew->getTrajectoryLikelihood() / t->getTrajectoryLikelihood();
 			if (jitter < w.getValue()) {
-				cout << "[MHC at iteration " << setw(8) << i << "] | Lnew: " << setw(18) << tNew->getTrajectoryLikelihood().getValue() <<
-					" | Lnew/L: " << setw(18) << w.getValue() << " | Jitter: " << jitter << endl;
+				cout << "[MHC at iteration " << setw(8) << i << "] | Lnew: " << setw(18) << tNew->getTrajectoryLikelihood().toString() <<
+					" | Lnew/L: " << setw(18) << w.toString() << " | Jitter: " << jitter << endl;
 				delete t;
 				t = tNew;
 				improvement = true;
