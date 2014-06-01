@@ -47,7 +47,7 @@ namespace sampler {
 
 			// Private method that really executes MHC,
 			// used as base for public methods.
-			Trajectory* generateSamples(Trajectory*, unsigned int, unsigned int);
+			Trajectory* generateSamples(Trajectory*, unsigned int, unsigned int, double);
 
 			// Helper methods for sampling algorithm
 			// Checks constraints (back and forward) from the specified position
@@ -68,14 +68,15 @@ namespace sampler {
 
 			// Generate trajectories using Metropolis Hastings with Constraints algorithm.
 			// Accepts two positive integer: number of samples to produce,
-			// and number of initial samples to discard (burn-in phase).
+			// and number of initial samples to discard (burn-in phase), and a perturbation factor,
+			// which indicates the probability that a perturbation is applied at each time instant.
 			// Each sample is a trajectory (succession of locations) which satisfy map constraints.
-			virtual void generateSamples(unsigned long, unsigned long);
+			virtual void generateSamples(unsigned long, unsigned long, double);
 
 			// Same as above, but the first parameter indicates the dimension
 			// of the "generation interval" (n). This function tries to generate 'n' more trajectories
 			// only if in the previous 'n' trajectories there was at least one likelihood improvement.
-			virtual void generateSamplesUntilWorth(unsigned long, unsigned long);
+			virtual unsigned long generateSamplesUntilWorth(unsigned long, unsigned long, double);
 
 			// Given a particular time instant, returns the a-posterior probabilities,
 			// as result of the Metropolis Hastings sampling algorithm.

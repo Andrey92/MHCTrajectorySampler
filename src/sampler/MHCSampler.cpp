@@ -21,7 +21,7 @@ namespace sampler {
 			ls[l] = map->likelyLocations(r->at(l).first);
 		}
 		firstSample = generateFirstSample();
-		cout << "Backtracking trajectory: " << firstSample->getTrajectoryLikelihood().toString() << endl << endl;;
+		cout << endl << "Backtracking trajectory likelihood: " << firstSample->getTrajectoryLikelihood().toString() << endl << endl;;
 	}
 
 	unsigned long MHCSampler::getSampleSize(void) const {
@@ -130,12 +130,10 @@ namespace sampler {
 	}
 
 	bool MHCSampler::checkConstraints(Trajectory* t, unsigned long& l) {
-		if (l == t->getSize() - 1) return checkBackConstraints(t, l);
 		unsigned int id = t->getLocation(l);
 		unsigned int lt = map->getLocation(id).getLatency();
-		unsigned int next = t->getLocation(l + 1);
-		if (l == 0) {
-			if (id == next) return true;
+		if (l == 0 && t->getSize() > 1) {
+			if (id == t->getLocation(l + 1)) return true;
 			return extendLatency(t, l, id, lt, true);
 		}
 		unsigned int prev = t->getLocation(l - 1);
@@ -146,7 +144,7 @@ namespace sampler {
 		// Check prev latency constraint
 		if (prev != id) {
 			unsigned int prevLt = map->getLocation(prev).getLatency();
-			for (unsigned long j = 1; j <= prevLt; j++) {
+			for (unsigned long j = 2; j <= prevLt; j++) {
 				if (j > l) return false;
 				if (t->getLocation(l - j) != prev) return false;
 			}
@@ -163,23 +161,28 @@ namespace sampler {
 			back--;
 		}
 
-		// Check forward constraints (and latency)
-		if (prev == id) {
+		if (l < t->getSize() - 1) {
+			unsigned int next = t->getLocation(l + 1);
+			// Check forward constraints (and latency)
+			if (prev == id) {
 
-			// Check next latency constraint
-			if (next != id) {
-				unsigned int nextLt = map->getLocation(next).getLatency();
-				for (unsigned long j = 2; j <= nextLt; j++) {
-					if (l + j >= t->getSize() || t->getLocation(l + j) != next)
-						return extendLatency(t, l, id, j, false);
+				// Check next latency constraint
+				if (next != id) {
+					unsigned int nextLt = map->getLocation(next).getLatency();
+					for (unsigned long j = 2; j <= nextLt; j++) {
+						if (l + j >= t->getSize()) break;
+						if (t->getLocation(l + j) != next) {
+							return extendLatency(t, l, id, j, false);
+						}
+					}
 				}
+
+				// Check Direct Reachability and Traveling Time Constraints
+				if (!checkForwardConstraints(t, l, id, next));
+
+			} else if (!extendLatency(t, l, id, lt, true)) {
+				return false;
 			}
-
-			// Check Direct Reachability and Traveling Time Constraints
-			if (!checkForwardConstraints(t, l, id, next));
-
-		} else if (!extendLatency(t, l, id, lt, true)) {
-			return false;
 		}
 		return true;
 	}
@@ -198,8 +201,10 @@ namespace sampler {
 				if (next != id) {
 					unsigned int nextLt = map->getLocation(next).getLatency();
 					for (unsigned long j = 1; j < nextLt; j++) {
-						if (tmpl + j >= t->getSize() || t->getLocation(tmpl + j) != next)
+						if (tmpl + j >= t->getSize()) break;
+						if (t->getLocation(tmpl + j) != next) {
 							return extendLatency(t, l, id, j + lt, false);
+						}
 					}
 				}
 			}
@@ -231,23 +236,24 @@ namespace sampler {
 		return true;
 	}
 
-	void MHCSampler::generateSamples(unsigned long n, unsigned long b) {
-		generateSamples(firstSample, n, b);
+	void MHCSampler::generateSamples(unsigned long n, unsigned long b, double f) {
+		generateSamples(firstSample, n, b, f);
 	}
 
-	void MHCSampler::generateSamplesUntilWorth(unsigned long n, unsigned long b) {
+	unsigned long MHCSampler::generateSamplesUntilWorth(unsigned long n, unsigned long b, double f) {
 		Trajectory* t = firstSample;
 		unsigned long i = 0;
 		do {
 			cout << endl << "[Iteration " << i << "] Try to generate " << n << " trajectories:" << endl << endl;
-			t = generateSamples(t, n, b);
+			t = generateSamples(t, n, b, f);
 			i++;
 			b = 0; // Burn-in phase only on first iteration
 		} while (t != nullptr);
 		cout << endl << "No likelihood improvements in last " << n << " trajectories: MHC stopped." << endl;
+		return i;
 	}
 
-	Trajectory* MHCSampler::generateSamples(Trajectory* t, unsigned int n, unsigned int b) {
+	Trajectory* MHCSampler::generateSamples(Trajectory* t, unsigned int n, unsigned int b, double f) {
 		srand(time(NULL));
 		bool improvement = false;
 		bool burnIn = true;
@@ -257,15 +263,30 @@ namespace sampler {
 				// Choose a random location for instant 'j' (among likely locations)
 				LocationSet* l = ls[j];
 				long count = 0;
-				do {
-					unsigned int pos = (unsigned int) rand() % l->size();
-					auto it = l->cbegin();
-					for ( ; pos > 0; it++, pos--) ;
-					unsigned int id = *it;
-					tNew->setLocation(id, j, p.getProb(readings->at(j).first, id));
-					if (count > 1000) cout << j << " " << flush;
-					count++;
-				} while (!checkConstraints(tNew, j));
+				double perturb = (double) rand() / RAND_MAX;
+				if (perturb < f) {
+					do {
+						unsigned int pos = (unsigned int) rand() % l->size();
+						auto it = l->cbegin();
+						for ( ; pos > 0; it++, pos--) ;
+						unsigned int id = *it;
+						tNew->setLocation(id, j, p.getProb(readings->at(j).first, id));
+						if (count > 1000) { /* ERROR: TODO FIX */
+							cout << "Loop detected at position " << j << endl;
+							int k = 0;
+							for (auto it = tNew->lbegin(); it != tNew->lend(); it++) {
+								cout << "tNew[" << k++ << "] = " << map->getLocation(*it).getName() << endl;
+							}
+							cout << endl << "Set of likely locations: ";
+							for (auto it = l->cbegin(); it != l->cend(); it++) {
+								cout << map->getLocation(*it).getName() + " ";
+							}
+							cout << endl;
+							exit(-1);
+						}
+						count++;
+					} while (!checkConstraints(tNew, j));
+				}
 			}
 			// Metropolis Hastings
 			long double jitter = (long double) rand() / RAND_MAX;
@@ -280,7 +301,7 @@ namespace sampler {
 				delete tNew;
 			}
 			if (burnIn && i >= b) {
-				if (b > 0) cout << "[End of the burn-in phase]" << endl;
+				if (b > 0) cout << "***** [End of the burn-in phase] *****" << endl;
 				burnIn = false;
 			}
 			if (i >= b) {
