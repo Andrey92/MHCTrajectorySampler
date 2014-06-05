@@ -22,13 +22,13 @@ namespace model {
 	Location::Location(unsigned int id, const string& name, double x, double y, double w, double h) :
 		id(id), name(name), position(x, y), width(w), height(h), latency(0), maxTimeFrom(0), maxTimeTo(0), cells() { }
 
-	Location::Location(unsigned int id, const string& s, const Point& p, double w, double h) :
+	Location::Location(unsigned int id, const string& name, const Point& p, double w, double h) :
 		id(id), name(name), position(p), width(w), height(h), latency(0), maxTimeFrom(0), maxTimeTo(0), cells() { }
 
 	Location::Location(unsigned int id, const string& name, double x, double y, double w, double h, unsigned int l) :
 		id(id), name(name), position(x, y), width(w), height(h), latency(l), maxTimeFrom(0), maxTimeTo(0), cells() { }
 
-	Location::Location(unsigned int id, const string& s, const Point& p, double w, double h, unsigned int l) :
+	Location::Location(unsigned int id, const string& name, const Point& p, double w, double h, unsigned int l) :
 		id(id), name(name), position(p), width(w), height(h), latency(l), maxTimeFrom(0), maxTimeTo(0), cells() { }
 
 	unsigned int Location::getId(void) const {

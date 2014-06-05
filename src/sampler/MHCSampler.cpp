@@ -2,6 +2,9 @@
 #include <ctime>
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
+#include <random>
+#include <chrono>
 
 #include "../include/sampler/MHCSampler.h"
 
@@ -16,9 +19,13 @@ namespace sampler {
 	 */
 
 	MHCSampler::MHCSampler(const Map* m, const Readings* r) : map(m), readings(r), p(m) {
-		ls = new LocationSet*[r->size()];
+		ls = new LocationRandomAccess*[r->size()];
 		for (unsigned long l = 0; l < r->size(); l++) {
-			ls[l] = map->likelyLocations(r->at(l).first);
+			LocationSet* tmp = map->likelyLocations(r->at(l).first);
+			ls[l] = new LocationRandomAccess(tmp->cbegin(), tmp->cend());
+			delete tmp;
+			unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+			shuffle<LocationRandomAccess::iterator, default_random_engine>(ls[l]->begin(), ls[l]->end(), default_random_engine(seed));
 		}
 		firstSample = generateFirstSample();
 		cout << endl << "Backtracking trajectory likelihood: " << firstSample->getTrajectoryLikelihood().toString() << endl << endl;;
@@ -30,7 +37,7 @@ namespace sampler {
 
 	Trajectory* MHCSampler::generateFirstSample(void) {
 		Trajectory* t = new Trajectory(0, readings->size());
-		state = new LocationIterator[readings->size()];
+		state = new LocationRandomIterator[readings->size()];
 		unsigned long l = 0;
 		// Backtracking
 		if (!assignLocation(t, l)) return nullptr;
@@ -98,7 +105,7 @@ namespace sampler {
 	}
 
 	bool MHCSampler::isValidLocation(unsigned long l, unsigned int id) {
-		for (LocationIterator li = ls[l]->cbegin(); li != ls[l]->cend(); li++) {
+		for (auto li = ls[l]->cbegin(); li != ls[l]->cend(); li++) {
 			if (id == *li) return true;
 		}
 		return false;
@@ -261,15 +268,27 @@ namespace sampler {
 			Trajectory* tNew = new Trajectory(i + 1, *t);
 			for (unsigned long j = 0; j < readings->size(); j++) {
 				// Choose a random location for instant 'j' (among likely locations)
-				LocationSet* l = ls[j];
+				LocationRandomAccess* lFull = ls[j];
+				LocationRandomAccess* l = nullptr;
+				if (j == 0) {
+					l = new LocationRandomAccess(*lFull);
+				} else {
+					l = new LocationRandomAccess();
+					for (auto it = lFull->cbegin(); it != lFull->cend(); it++) {
+						unsigned int prev = t->getLocation(j - 1);
+						if (map->getDR(prev, *it) || prev == *it) l->push_back(*it);
+					}
+				}
 				long count = 0;
 				double perturb = (double) rand() / RAND_MAX;
 				if (perturb < f) {
 					do {
 						unsigned int pos = (unsigned int) rand() % l->size();
-						auto it = l->cbegin();
+						auto it = l->begin();
 						for ( ; pos > 0; it++, pos--) ;
 						unsigned int id = *it;
+						if (id == tNew->getLocation(j)) break;
+						l->erase(it);
 						tNew->setLocation(id, j, p.getProb(readings->at(j).first, id));
 						if (count > 1000) { /* ERROR: TODO FIX */
 							cout << "Loop detected at position " << j << endl;
@@ -287,6 +306,7 @@ namespace sampler {
 						count++;
 					} while (!checkConstraints(tNew, j));
 				}
+				delete l;
 			}
 			// Metropolis Hastings
 			long double jitter = (long double) rand() / RAND_MAX;
@@ -301,7 +321,7 @@ namespace sampler {
 				delete tNew;
 			}
 			if (burnIn && i >= b) {
-				if (b > 0) cout << "***** [End of the burn-in phase] *****" << endl;
+				if (b > 0) cout << endl << "***** [End of the burn-in phase] *****" << endl << endl;
 				burnIn = false;
 			}
 			if (i >= b) {

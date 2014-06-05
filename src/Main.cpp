@@ -21,9 +21,6 @@
 #define MAP_FILE "input/map.txt"
 #define CONSTRAINTS_FILE "input/IC_DU_LT_TT.txt"
 
-#define MIN_NUM_SAMPLES 1000
-#define MIN_BURN_IN_PHASE 0
-
 using namespace std;
 using namespace model;
 using namespace sampler;
@@ -71,9 +68,9 @@ int main(int argc, char** argv) {
 		mhcs.generateSamples(n, b, f);
 	}
 	end = clock();
-	cout << endl << "Time elapsed to generate " << n * iterations << " trajectories: " << (double)(end - start) / CLOCKS_PER_SEC << " sec" << endl << endl;
+	cout << endl << "Time elapsed to generate " << n * iterations + b << " trajectories: " << (double)(end - start) / CLOCKS_PER_SEC << " sec" << endl << endl;
 	const vector<double> v = getMHCAccuracy(mhcs, *m);
-	cout << endl << "Results of MHCSampler with " << n - b + n * (iterations - 1) << " accepted samples and a perturbation factor of " << f << ":" << endl <<
+	cout << endl << "Results of MHCSampler with " << n * iterations << " accepted samples and a perturbation factor of " << f << ":" << endl <<
 		"   Accuracy: " << v[0] << endl << "   Location miss rate: " << v[1] << endl;
 	return 0;
 }
@@ -99,7 +96,7 @@ void loadParams(int argc, char** argv) {
 					exit(-1);
 				}
 				n = stoul(line);
-				if ((long)n < 0 || n < MIN_NUM_SAMPLES) throw "Value must be >= " + to_string(MIN_NUM_SAMPLES);
+				if ((long)n < 0) throw "Value must be >= 0";
 			} catch(const string& s) {
 				cout << s << endl;
 			} catch(exception& e) {
@@ -116,7 +113,7 @@ void loadParams(int argc, char** argv) {
 					exit(-1);
 				}
 				b = stoul(line);
-				if ((long)b < 0 || b < MIN_BURN_IN_PHASE) throw "Value must be >= " + to_string(MIN_BURN_IN_PHASE);
+				if ((long)b < 0) throw "Value must be >= 0";
 			} catch(const string& s) {
 				cout << s << endl;
 			} catch(exception& e) {
@@ -145,11 +142,11 @@ void loadParams(int argc, char** argv) {
 		int offset = argc - 4;
 		try {
 			n = stoul(argv[1 + offset]);
-			if ((long)n < 0 || n < MIN_NUM_SAMPLES) throw "Value must be >= " + to_string(MIN_NUM_SAMPLES);
+			if ((long)n < 0) throw "Number of samples must be >= 0";
 			b = stoul(argv[2 + offset]);
-			if ((long)b < 0 || b < MIN_BURN_IN_PHASE) throw "Value must be >= " + to_string(MIN_BURN_IN_PHASE);
+			if ((long)b < 0) throw "Number of samples of the burn-in phase must be >= 0";
 			f = stod(argv[3 + offset]);
-			if (f < 0 || f > 1) throw "Value must be in range [0,1]";
+			if (f < 0 || f > 1) throw "Perturbation factor must be in range [0,1]";
 		} catch(const string& s) {
 			cout << s << endl;
 			exit(-1);

@@ -19,7 +19,7 @@ namespace sampler {
 			// Readings (collection of <{ri},t> pairs)
 			const Readings* readings;
 			// Set of likely locations for each time instant
-			LocationSet** ls;
+			LocationRandomAccess** ls;
 			// First sample generated with backtracking
 			Trajectory* firstSample;
 			// Collection of samples generated
@@ -28,7 +28,7 @@ namespace sampler {
 			Probs p;
 
 			// State variables for backtracking algorithm
-			LocationIterator* state;
+			LocationRandomIterator* state;
 			stack<unsigned long> prevIndexes;
 
 			// Generates and returns first trajectory compatible with map and readings,

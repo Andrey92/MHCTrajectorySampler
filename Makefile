@@ -3,7 +3,7 @@
 #
 
 CC=g++
-CCFLAGS=-std=c++0x -Wall
+CCFLAGS=-std=c++0x -Wall -O3
 
 HSRC=src/include/*
 CPPSRC=src/*.cpp src/*/*.cpp
