@@ -19,6 +19,9 @@ namespace model {
 		tt = Util::allocateMatrix<unsigned int>(lCount, lCount);
 		Util::fillMatrix<bool>(dr, lCount, lCount, false);
 		Util::fillMatrix<unsigned int>(tt, lCount, lCount, 0);
+		for (unsigned int i = 0; i < lCount; i++) {
+			dr[i][i] = true;
+		}
 	}
 
 	void Map::initCells(void) {

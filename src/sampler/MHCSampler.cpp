@@ -24,11 +24,12 @@ namespace sampler {
 			LocationSet* tmp = map->likelyLocations(r->at(l).first);
 			ls[l] = new LocationRandomAccess(tmp->cbegin(), tmp->cend());
 			delete tmp;
-			unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+			unsigned seed = chrono::system_clock::now().time_since_epoch().count();
 			shuffle<LocationRandomAccess::iterator, default_random_engine>(ls[l]->begin(), ls[l]->end(), default_random_engine(seed));
 		}
 		firstSample = generateFirstSample();
-		cout << endl << "Backtracking trajectory likelihood: " << firstSample->getTrajectoryLikelihood().toString() << endl << endl;;
+		cout << endl << "Backtracking trajectory likelihood: " << firstSample->getTrajectoryLikelihood().toString() << endl << endl;
+		adj = new Adjacents(m);
 	}
 
 	unsigned long MHCSampler::getSampleSize(void) const {
@@ -36,7 +37,8 @@ namespace sampler {
 	}
 
 	Trajectory* MHCSampler::generateFirstSample(void) {
-		Trajectory* t = new Trajectory(0, readings->size());
+		sampleId = 0;
+		Trajectory* t = new Trajectory(sampleId, readings->size());
 		state = new LocationRandomIterator[readings->size()];
 		unsigned long l = 0;
 		// Backtracking
@@ -265,7 +267,7 @@ namespace sampler {
 		bool improvement = false;
 		bool burnIn = true;
 		for (unsigned long i = 0; i < n + b; i++) {
-			Trajectory* tNew = new Trajectory(i + 1, *t);
+			Trajectory* tNew = new Trajectory(++sampleId, *t);
 			for (unsigned long j = 0; j < readings->size(); j++) {
 				// Choose a random location for instant 'j' (among likely locations)
 				LocationRandomAccess* lFull = ls[j];
@@ -273,13 +275,20 @@ namespace sampler {
 				if (j == 0) {
 					l = new LocationRandomAccess(*lFull);
 				} else {
-					l = new LocationRandomAccess();
-					for (auto it = lFull->cbegin(); it != lFull->cend(); it++) {
-						unsigned int prev = t->getLocation(j - 1);
-						if (map->getDR(prev, *it) || prev == *it) l->push_back(*it);
-					}
+					unsigned int prev = tNew->getLocation(j - 1);
+					//if (lFull->size() < map->getLocationCount()) {
+						l = new LocationRandomAccess();
+						for (auto it = lFull->cbegin(); it != lFull->cend(); it++) {
+							if (map->getDR(prev, *it) || prev == *it) l->push_back(*it);
+						}
+					/*} else {
+						l = new LocationRandomAccess(*(adj->getAdjacents(prev)));
+						for (auto it = l->begin(); it != l->end(); it++) {
+							cout << map->getLocation(*it).getName() << " ";
+						}
+						cout << endl;
+					}*/
 				}
-				long count = 0;
 				double perturb = (double) rand() / RAND_MAX;
 				if (perturb < f) {
 					do {
@@ -289,21 +298,9 @@ namespace sampler {
 						unsigned int id = *it;
 						if (id == tNew->getLocation(j)) break;
 						l->erase(it);
-						tNew->setLocation(id, j, p.getProb(readings->at(j).first, id));
-						if (count > 1000) { /* ERROR: TODO FIX */
-							cout << "Loop detected at position " << j << endl;
-							int k = 0;
-							for (auto it = tNew->lbegin(); it != tNew->lend(); it++) {
-								cout << "tNew[" << k++ << "] = " << map->getLocation(*it).getName() << endl;
-							}
-							cout << endl << "Set of likely locations: ";
-							for (auto it = l->cbegin(); it != l->cend(); it++) {
-								cout << map->getLocation(*it).getName() + " ";
-							}
-							cout << endl;
-							exit(-1);
-						}
-						count++;
+						double prob = p.getProb(readings->at(j).first, id);
+						if (prob < Probs::MIN_PROB) continue;
+						tNew->setLocation(id, j, prob);
 					} while (!checkConstraints(tNew, j));
 				}
 				delete l;

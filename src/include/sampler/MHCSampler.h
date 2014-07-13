@@ -8,6 +8,7 @@
 #include "../util/Types.h"
 #include "Types.h"
 #include "Probs.h"
+#include "../model/Adjacents.h"
 
 namespace sampler {
 
@@ -18,10 +19,14 @@ namespace sampler {
 			const Map* map;
 			// Readings (collection of <{ri},t> pairs)
 			const Readings* readings;
+			// Adjacents lists (For optimization)
+			const Adjacents* adj;
 			// Set of likely locations for each time instant
 			LocationRandomAccess** ls;
 			// First sample generated with backtracking
 			Trajectory* firstSample;
+			// Current sample id
+			unsigned long sampleId;
 			// Collection of samples generated
 			Samples samples;
 			// Probabilities cache

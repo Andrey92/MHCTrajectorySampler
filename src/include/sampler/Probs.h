@@ -22,6 +22,10 @@ namespace sampler {
 			LikeliMap lm;
 
 		public:
+			// Minimum probability value
+			// Each location with a probability < MIN_PROB should be discarded.
+			static const double MIN_PROB;
+
 			// Constructor
 			Probs(const Map*);
 

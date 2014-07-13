@@ -62,10 +62,10 @@ namespace model {
 
 	template<class RSet>
 	double Map::prob(const RSet& rs, unsigned int id) const {
-		double p_tot = 0, pr;
+		double p_tot = 0.0, pr;
 		Location l = locations[id];
 		for (auto c_it = l.begin(); c_it != l.end(); c_it++) {
-			Cell c = *c_it; pr = 1;
+			Cell c = *c_it; pr = 1.0;
 			for (unsigned int i = 0; i < rCount; i++) {
 				Reader r = readers[i];
 				if (find(rs.cbegin(), rs.cend(), i) != rs.cend()) {

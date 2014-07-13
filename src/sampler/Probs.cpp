@@ -6,6 +6,8 @@ namespace sampler {
 	 * Implementation of Probs utility class
 	 */
 
+	const double Probs::MIN_PROB = 1e-6;
+
 	Probs::Probs(const Map* m) : m(m) { }
 
 	double Probs::getProb(const ReaderSet& rs, unsigned int id) {
