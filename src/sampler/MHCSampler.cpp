@@ -276,18 +276,14 @@ namespace sampler {
 					l = new LocationRandomAccess(*lFull);
 				} else {
 					unsigned int prev = tNew->getLocation(j - 1);
-					//if (lFull->size() < map->getLocationCount()) {
+					if (lFull->size() < map->getLocationCount()) {
 						l = new LocationRandomAccess();
 						for (auto it = lFull->cbegin(); it != lFull->cend(); it++) {
 							if (map->getDR(prev, *it) || prev == *it) l->push_back(*it);
 						}
-					/*} else {
+					} else {
 						l = new LocationRandomAccess(*(adj->getAdjacents(prev)));
-						for (auto it = l->begin(); it != l->end(); it++) {
-							cout << map->getLocation(*it).getName() << " ";
-						}
-						cout << endl;
-					}*/
+					}
 				}
 				double perturb = (double) rand() / RAND_MAX;
 				if (perturb < f) {

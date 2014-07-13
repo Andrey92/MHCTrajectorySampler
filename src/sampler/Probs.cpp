@@ -6,7 +6,7 @@ namespace sampler {
 	 * Implementation of Probs utility class
 	 */
 
-	const double Probs::MIN_PROB = 1e-6;
+	const double Probs::MIN_PROB = 1e-10;
 
 	Probs::Probs(const Map* m) : m(m) { }
 
